@@ -1,0 +1,25 @@
+See also this fork: https://github.com/robertc/DragNDrop_PlanningBoard/commit/486c9b32025362b45f0e0c83416bae60c300dc97
+
+Critical basic TODOs:
+
+- edit task inline (`text` attribute to store)
+- add task
+- load/send via AJAX (with at least some dumb handler)
+
+Improvements:
+
+- set effort points / estimates (`effort` attribute to store)
+- set colour (for QA/BE/FE)
+
+After all that — automated Burndown chart:
+
+- update timestamp on task status change
+- add a chart (just a table) where columns represent dates from sprint start
+  to sprint end (for starters just min/max known dates), groups tasks into
+  these columns by timestamp; then for each date:
+
+      done = done_today + done_before_today
+      left_today = total - done
+
+  Note that all numbers are not task count but effort points.
+  OTOH, even task count would do for now.
