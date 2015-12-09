@@ -1,136 +1,201 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<title>Simple Agile Planning Board</title>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Simple Agile Planning Board</title>
 
-	<style>
-		body
-		{
-			font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
-		}
-		#board
-		{
-			width: 910px;
-			min-height:100px;
-			
-			position:relative;
-		}
+    <style>
+body {
+    font-family: Ubuntu, Arial, sans-serif;
+}
+table {
+    border: 1px solid gray;
+    border-collapse: collapse;
+}
 
-		.title
-		{
-			background-color:#52460a;	
-			text-align:center;
-			color:white;
-			padding: 2px 0px;
-		}
-		
-		#inprogress
-		{
-			left:302px;
-		}
-		
-		#done
-		{
-			left:604px;	
-		}
-		
-		#todo, #inprogress, #done
-		{
-			background-color: tan;
+table#board {
+    width: 100%;
+    min-height: 20em;
+    position: relative;
+}
+table#board > thead > tr > th {
+    padding: .5em;
+    border: 1px solid white;
+    background-color: #996633;
+    color: white;
+    min-width: 10em;
+}
+table#board > tbody > tr > td {
+    padding: .5em;
+    border: 1px dashed white;
+    background: tan;
+}
+table#board > tbody > tr > td.story {
+    background: #996633;
+    color: white;
+}
 
-			position:absolute;
+.card {
+    float: left;
+    width: 8em;
+    height: 4em;
+    margin: 10px;
+    min-height: 60px;
+    padding: .5em;
+    cursor: pointer;
+    background: white;
+    background: -moz-radial-gradient(40% 145% 1deg, circle closest-corner, rgba(220, 220, 220, .9) 50%, rgba(242, 242, 242, .9) 95%);
+    box-shadow: 1px 1px 5px #888888;
+}
 
-			width: 300px;
-			min-height:150px;
-			border: 2px solid black;	
-			
-		}
-		
-		*[draggable=true]
-		{
-			float:left;
-			min-width: 50px;
-			min-height: 50px;
-			border: 2px solid black;
-			margin: 10px;
+textarea#serialized {
+    width: 900px;
+    height: 200px;
+    margin-top: 5em;
+    padding: 2em;
+    background: white;
+    color: #cc9966;
+    border: 1px solid #cc9966;
+}
 
-			font-weight:bold;
+</style>
+<body>
+    <table id="board">
+        <thead>
+            <tr>
+                <th>User Story</th>
+                <th>To Do</th>
+                <th>In Progress</th>
+                <th>Done</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="story1">
+                <td class="story">
+                    <strong>As</strong> a Product Owner<br>
+                    <strong>I want</strong> to prioritize stories</br>
+                    <strong>So that</strong> the Team picks the most important ones
+                </td>
+                <td class="tasks_todo">
+                    <div class="card" id="item1" draggable="true">
+                        Learn HTML5
+                    </div>
+                    <div class="card" id="item2" draggable="true">
+                        Learn HTML6
+                    </div>
+                    <div class="card" id="item3" draggable="true">
+                        Learn HTML7
+                    </div>
+                    <div class="card" id="item4" draggable="true">
+                        Learn HTML 9000 and jump twice
+                    </div>
+                </td>
+                <td class="tasks_progress">
+                </td>
+                <td class="tasks_done">
+                </td>
+            </tr>
+            <tr id="story2">
+                <td class="story">
+                    <strong>As</strong> a Team member<br>
+                    <strong>I want</strong> to split stories into one-day tasks</br>
+                    <strong>So that</strong> I can estimate effort <strong>and</strong> have daily progress
+                </td>
+                <td class="tasks_todo">
+                    <div class="card" id="item5" draggable="true">
+                        Learn HTML5
+                    </div>
+                    <div class="card" id="item6" draggable="true">
+                        Learn HTML6
+                    </div>
+                    <div class="card" id="item7" draggable="true">
+                        Learn HTML7
+                    </div>
+                    <div class="card" id="item8" draggable="true">
+                        Learn HTML 9000 and jump twice
+                    </div>
+                </td>
+                <td class="tasks_progress">
+                </td>
+                <td class="tasks_done">
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-			min-height:60px;
-						background-image: -webkit-gradient(linear, 
-            		left top, left bottom,
-					color-stop(0.63, white),  
-            		color-stop(0.92, rgb(5,161,245)));
-                    background-image:-moz-linear-gradient(                   
-                        center top,
-                        white 63%,
-                        rgb(5,161,245) 92%
-                    );
-            	 -webkit-background-size:1px 8px;
-            	 -moz-background-size:1px 8px;
-            	 background-size:1px 8px;
-				 background-repeat:repeat;
-		}
+    <textarea id="serialized"></textarea>
 
-		.cardTitle
-		{
-			background-color: rgb(255,255,255);
-			border:2px solid white;
-		}
+    <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
 
-	</style>
-	<body>
-    <div id="board">
-        <div id="todo">
-        	<div class="title">To Do</div>
-        <div id="item1" draggable="true">
-            <div class="cardTitle">
-                Learn HTML5
-            </div>
-        </div>
-        <div id="item2" draggable="true">
-            <div class="cardTitle">
-                Learn CSS3
-            </div>
-        </div>
-        	<!--<div id="item3" draggable="true">Make an amazing site</div>
-        	<div id="item4" draggable="true">Impress my friends</div>-->
-        </div>
-		<div id="inprogress">
-			<div class="title">In Progress</div>
-		</div>
-			
-		<div id="done">
-			<div class="title">Done</div>
-		</div>
+    <script type="text/javascript">
 
-		
-        <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js">
-        </script>
+$('document').ready(init);
 
-		<script type="text/javascript">
-		$('document').ready(init);
-		
-        function init(){
-            $('#item1, #item2').bind('dragstart', function(event) {
-                event.originalEvent.dataTransfer.setData("text/plain", event.target.getAttribute('id'));
-            });
-            
-  		    // bind the dragover event on the board sections
-            $('#todo, #inprogress, #done').bind('dragover', function(event) {
-                event.preventDefault();
-            });
-			
-			// bind the drop event on the board sections
-  			$('#todo, #inprogress, #done').bind('drop', function(event) {
-            var notecard = event.originalEvent.dataTransfer.getData("text/plain");
-            event.target.appendChild(document.getElementById(notecard));
-			// Turn off the default behaviour
-			// without this, FF will try and go to a URL with your id's name
-            event.preventDefault();
-			});
+function init() {
+    $('.card').bind('dragstart', function(event) {
+        console.log('dragstart', event);
+        event.originalEvent.dataTransfer.setData("item_id", event.target.getAttribute('id'));
+    });
+
+    // bind the dragover event on the board sections
+    $('table#board > tbody > tr > td').bind('dragover', function(event) {
+        event.preventDefault();
+    });
+
+    // bind the drop event on the board sections
+    $('table#board > tbody > tr > td').bind('drop', function(event) {
+        console.log('drop', event);
+
+        target = event.target;
+
+        // make sure we don't drop a card into another card
+        // TODO: check if it's a td
+        if ($(event.target).hasClass('card')) {
+            target = event.target.parentNode;
         }
-		</script>
-	</body>
+
+        var card_id = event.originalEvent.dataTransfer.getData("item_id");
+        var card = document.getElementById(card_id);
+
+        // prevent dragging cards between different stories
+        // (could also remember and check story id)
+        if ($(event.target).parents('tr').get(0) != $(card.parentNode).parents('tr').get(0)) {
+            console.log('Prevented dragging a card between different stories.');
+            return;
+        }
+
+        target.appendChild(card);
+        // Turn off the default behaviour
+        // without this, FF will try and go to a URL with your id's name
+        event.preventDefault();
+
+        serializeBoard();
+    });
+
+    function serializeBoard () {
+        var TASK_STATUSES = ['todo', 'progress', 'done'];
+        var data = [];
+        var serialized;
+        //var col_idx_to_status;
+        $('table#board > tbody > tr').each(function(story_row_idx, story_row) {
+            console.log(story_row_idx, story_row);
+            TASK_STATUSES.forEach(function (status) {
+                var tasks = $(story_row).children('td.tasks_' + status).children('.card');
+                window.x = tasks;
+                tasks.each(function (task_idx, task) {
+                    window.x = task;
+                    data.push({
+                        id: task.getAttribute('id'),
+                        status: status,
+                    });
+                });
+            });
+        })
+        serialized = JSON.stringify(data);
+        $('#serialized').text(serialized);
+    }
+}
+
+    </script>
+</body>
 </html>
