@@ -23,3 +23,10 @@ After all that — automated Burndown chart:
 
   Note that all numbers are not task count but effort points.
   OTOH, even task count would do for now.
+
+
+Prototype vision:
+
+- In-memory DB
+- full fetch on page load
+- per-task save (name OR status) on related UI event

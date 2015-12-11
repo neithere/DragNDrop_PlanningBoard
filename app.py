@@ -28,7 +28,7 @@ stories:
     why: the bike is safe
   story2:
     who: librarian
-    what: bookshelf
+    what: a bookshelf
     why: the books are organized
 
 tasks:
@@ -101,8 +101,7 @@ def data_json():
             'why': story['why'],
             'tasks_by_state': tasks_by_state,
         })
-    #return Response(json.dumps(data), content_type='text/json')
-    return json.dumps(data)
+    return Response(json.dumps(data), content_type='text/json')
 
 @app.route('/task/rename', methods=['POST'])
 def task_rename():

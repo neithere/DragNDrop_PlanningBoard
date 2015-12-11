@@ -3,7 +3,7 @@
         <tr>
             <th>User Story</th>
             {{#each states}}
-            <th>{{ this.label }}</th>
+                <th>{{ this.label }}</th>
             {{/each}}
         </tr>
     </thead>
@@ -11,9 +11,9 @@
     {{#each stories}}
         <tr id="story_{{ id }}">
             <td class="story">
-                <strong>As</strong> {{ who }}<br>
-                <strong>I want</strong> {{ what }}</br>
-                <strong>In order to</strong> {{ why }}
+                <em>As</em> {{ who }}<br>
+                <em>I want</em> {{ what }}</br>
+                <em>So that</em> {{ why }}
             </td>
             {{#each tasks_by_state}}
                 <td>
