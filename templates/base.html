@@ -131,120 +131,70 @@ textarea#serialized {
 
     <textarea id="serialized"></textarea>
 
-    <table id="lab-rat"></table>
-
-
-    <script id="board-template" type="text/x-handlebars-template">
-<table id="lab-rat">
-    <thead>
-        <tr>
-            <th>User Story</th>
-            {{#each states}}
-            <th>{{this}}</th>
-            {{/each}}
-        </tr>
-    </thead>
-    <tbody>
-    {{#each stories as |story story_idx|}}
-        {{ story }}
-        <tr id="story_{{ story.id }}">
-            <td class="story">
-                <strong>As</strong> {{ story.who }}<br>
-                <strong>I want</strong> {{ story.what }}</br>
-                <strong>So that</strong> {{ story.why }}
-            </td>
-            {{#each states as |state idx|}}
-            <td class="tasks_{{ this }}">
-                <div class="card" id="task1" draggable="true">Learn HTML5</div>
-                <div class="card" id="task2" draggable="true">
-                    Learn HTML6
-                </div>
-                <div class="card" id="task3" draggable="true">
-                    Learn HTML7
-                </div>
-                <div class="card" id="task4" draggable="true">
-                    Learn HTML 9000 and jump twice
-                </div>
-            </td>
-            <td class="tasks_progress">
-            </td>
-            <td class="tasks_done">
-            </td>
-            {{/each}}
-        </tr>
-    {{/each}}
-    </tbody>
-</table>
-    </script>
-
     <script type="text/javascript">
 
 $('document').ready(init);
 
 function init() {
-    $('.card').bind('dragstart', function(event) {
-        console.log('dragstart', event);
-        event.originalEvent.dataTransfer.setData("item_id", event.target.getAttribute('id'));
-    });
 
-    // bind the dragover event on the board sections
-    $('table#board > tbody > tr > td').bind('dragover', function(event) {
-        event.preventDefault();
-    });
+    function bindBoardEvents() {
+        $('.card').bind('dragstart', function(event) {
+            event.originalEvent.dataTransfer.setData("item_id", event.target.getAttribute('id'));
+        });
 
-    // bind the drop event on the board sections
-    $('table#board > tbody > tr > td').bind('drop', function(event) {
-        console.log('drop', event);
+        // bind the dragover event on the board sections
+        $('table#board > tbody > tr > td').bind('dragover', function(event) {
+            event.preventDefault();
+        });
 
-        target = event.target;
+        // bind the drop event on the board sections
+        $('table#board > tbody > tr > td').bind('drop', function(event) {
+            target = event.target;
 
-        // make sure we don't drop a card into another card
-        // TODO: check if it's a td
-        if ($(event.target).hasClass('card')) {
-            target = event.target.parentNode;
-        }
+            // make sure we don't drop a card into another card
+            // TODO: check if it's a td
+            if ($(event.target).hasClass('card')) {
+                target = event.target.parentNode;
+            }
 
-        var card_id = event.originalEvent.dataTransfer.getData("item_id");
-        var card = document.getElementById(card_id);
+            var card_id = event.originalEvent.dataTransfer.getData("item_id");
+            var card = document.getElementById(card_id);
 
-        // prevent dragging cards between different stories
-        // (could also remember and check story id)
-        if ($(event.target).parents('tr').get(0) != $(card.parentNode).parents('tr').get(0)) {
-            console.log('Prevented dragging a card between different stories.');
-            return;
-        }
+            // prevent dragging cards between different stories
+            // (could also remember and check story id)
+            if ($(event.target).parents('tr').get(0) != $(card.parentNode).parents('tr').get(0)) {
+                return;
+            }
 
-        target.appendChild(card);
-        // Turn off the default behaviour
-        // without this, FF will try and go to a URL with your id's name
-        event.preventDefault();
+            target.appendChild(card);
+            // Turn off the default behaviour
+            // without this, FF will try and go to a URL with your id's name
+            event.preventDefault();
 
-        serializeBoard();
-    });
+            serializeBoard();
+        });
 
-    $('.card').editable('http://localhost:5000/task/rename', {
-        //method: 'get',
-        indicator: 'Saving...',
-        tooltip: 'Click to edit...',
-        placeholder: '(Click to edit)',
-        cssclass: 'card-edit-form',
-        type: 'textarea',
-        style: 'inherit',
-        submit: 'OK',
-        onblur: 'submit',
-    });
+        $('.card').editable('/task/rename', {
+            indicator: 'Saving...',
+            tooltip: 'Click to edit...',
+            placeholder: '(Click to edit)',
+            cssclass: 'card-edit-form',
+            type: 'textarea',
+            style: 'inherit',
+            submit: 'OK',
+            onblur: 'submit',
+        });
+    };
 
     function populateBoard() {
-        $.getJSON('http://localhost:5000/data', function(data) {
-            var source   = $("#board-template").html();
-            var template = Handlebars.compile(source);
-            //console.log(template(foo=1));
-            var html = template(data);
-            console.log('rendered board template: ', html);
-            //$('table#board').html(html);
-            $('table#lab-rat').html(html);
-            console.log('(prevented table refresh from template -- TODO)');
+        $.getJSON('/data', function(data) {
+            $.get('static/board.template.js', function (raw_template) {
+                var template = Handlebars.compile(raw_template);
+                $('table#board').html(template(data));
+                bindBoardEvents();
+            }, 'html');
         });
+
     }
     populateBoard();
 
@@ -254,9 +204,7 @@ function init() {
         var TASK_STATUSES = ['todo', 'progress', 'done'];
         var data = [];
         var serialized;
-        //var col_idx_to_status;
         $('table#board > tbody > tr').each(function(story_row_idx, story_row) {
-            console.log(story_row_idx, story_row);
             TASK_STATUSES.forEach(function (status) {
                 var tasks = $(story_row).children('td.tasks_' + status).children('.card');
                 window.x = tasks;
