@@ -18,7 +18,7 @@
             {{#each tasks_by_state}}
                 <td>
                     {{#each this}}
-                        <div class="card" id="{{ id }}" draggable="true">{{ summary }}</div>
+                        <div class="card" id="{{ id }}" draggable="true" data-state-idx="{{ @../key }}">{{ summary }}</div>
                     {{/each}}
                 </td>
             {{/each}}

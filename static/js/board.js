@@ -36,12 +36,24 @@ function init() {
                 return;
             }
 
-            target.appendChild(card);
+            // XXX this is very ugly: we should reference states by name, not by column index
+            $.post('/task/move',
+                {
+                    id: card_id,
+                    state_idx: target.cellIndex-1  // column number not counting story column
+
+                },
+                function () {
+                    target.appendChild(card);
+                    card.setAttribute('data-state-idx', target.cellIndex)-1
+                }
+            );
+
+
             // Turn off the default behaviour
             // without this, FF will try and go to a URL with your id's name
             event.preventDefault();
 
-            serializeBoard();
         });
 
         $('.card').editable('/task/rename', {
@@ -67,28 +79,4 @@ function init() {
 
     }
     populateBoard();
-
-    function serializeBoard () {
-        // XXX maybe we don't even need to serialize the whole thing;
-        //     just send the event on edit/drop
-        var TASK_STATUSES = ['todo', 'progress', 'done'];
-        var data = [];
-        var serialized;
-        $('table#board > tbody > tr').each(function(story_row_idx, story_row) {
-            TASK_STATUSES.forEach(function (status) {
-                var tasks = $(story_row).children('td.tasks_' + status).children('.card');
-                window.x = tasks;
-                tasks.each(function (task_idx, task) {
-                    window.x = task;
-                    data.push({
-                        id: task.getAttribute('id'),
-                        status: status,
-                        text: task.textContent.replace(/^[\n ]+/, '').replace(/[\n ]+$/, ''),
-                    });
-                });
-            });
-        })
-        serialized = JSON.stringify(data);
-        $('#serialized').text(serialized);
-    }
 }

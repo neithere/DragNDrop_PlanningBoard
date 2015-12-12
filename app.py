@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-from flask import Flask, Response, request, render_template
+from flask import Flask, Response, request, jsonify, render_template
 
-import json
 import yaml
 
 
@@ -35,7 +34,7 @@ tasks:
 
   task0:
     story: story1
-    state: todo
+    state: progress
     summary: measure bike dimensions
   task1:
     story: story1
@@ -101,19 +100,28 @@ def data_json():
             'why': story['why'],
             'tasks_by_state': tasks_by_state,
         })
-    return Response(json.dumps(data), content_type='text/json')
+    return jsonify(data)
+
 
 @app.route('/task/rename', methods=['POST'])
 def task_rename():
     id = request.values['id']
-    new_name = request.values['name']
-    return Response('hello')
+    new_summary = request.values['value']
+    assert id and new_summary
+    DB['tasks'][id]['summary'] = new_summary
+    return Response(new_summary)
 
 
 @app.route('/task/move', methods=['POST'])
-def task_move(id):
+def task_move():
     id = request.values['id']
-    return 'hello'
+    new_state_idx = int(request.values['state_idx'])
+    print('new state idx:', new_state_idx)
+    assert id and 0 <= new_state_idx
+    new_state = DB['states'][new_state_idx]
+    print('new state:', new_state)
+    DB['tasks'][id]['state'] = new_state['name']
+    return Response(new_state['name'])
 
 
 if __name__ == '__main__':
